@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Merger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300&display=swap" rel="stylesheet">
+</head>
+<style>
+  * {
+    font-family: 'Oswald';
+    font-size: 20px;
+  }
+  input {
+    height: 20px;
+    width: 20px;
+    border: 1px solid black;
+    border-radius: 4px;
+    background-color: white;
+  }
+  input:hover {
+    background-color: rgb(240, 240, 240);
+  }
+  input.add {
+    background-color: green;
+  }
+  input.remove {
+    background-color: red;
+  }
+</style>
+<body>
+  <script>
+    var link = window.location.href;
+    var list_parts = link.split('?');
+
+    // Function to get URL parameters
+    function getURLParameters(url) {
+      const params = {};
+      const urlSearchParams = new URLSearchParams(url);
+      for (const [key, value] of urlSearchParams.entries()) {
+        params[key] = value;
+      }
+      return params;
+    }
+
+    // Function to load and merge images horizontally
+    function mergeImages(imageUrls, imagesPerRow) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      // Set canvas dimensions based on the total width and number of rows
+      const imageWidth = 200; // Assuming each image is 100px wide
+      const imageHeight = 134; // Assuming each image is 100px tall
+      const rowWidth = imagesPerRow || 5; // Default to 5 images per row
+      const columns = Math.ceil(imageUrls.length / imagesPerRow);
+      canvas.width = rowWidth * imageWidth;
+      canvas.height = columns * imageHeight;
+
+      let currentX = 0;
+      let currentY = 0;
+      let imagesDrawn = 0;
+
+      // Load and draw each image on the canvas
+      imageUrls.forEach((imageUrl) => {
+        const img = new Image();
+        img.src = './img/' + imageUrl + '.png';
+
+        img.onload = () => {
+          context.drawImage(img, currentX, currentY, imageWidth, imageHeight);
+
+          // Update positions for the next image
+          currentX += imageWidth;
+          imagesDrawn++;
+
+          // Check if the row is complete
+          if (imagesDrawn % imagesPerRow === 0) {
+            currentX = 0;
+            currentY += imageHeight;
+          }
+
+          // Check if all images are loaded and merged
+          if (imagesDrawn === imageUrls.length) {
+            // Append canvas to the body or wherever you want to display the merged image
+            document.body.appendChild(canvas);
+          }
+        };
+      });
+    }
+
+    const url = window.location.search;
+    const params = getURLParameters(url);
+    var value = params.id;
+
+    // Assuming the URL parameter is 'images' and its value is a comma-separated list of image URLs
+    var imageUrls = params.id ? params.id.split(',') : [];
+    imageUrls.splice(0, 1);
+
+    function addIdeology(ideology) {
+      value += (',' + ideology);
+      list_parts[1] = 'id=' + value;
+      var url_new = list_parts[0] + '?' + list_parts[1];
+
+      window.location = url_new;
+    }
+
+    function removeIdeology(ideology) {
+      var url_new = list_parts[0] + '?id=' + value.replace((',' + ideology),'');
+      window.location = url_new;
+    }
+
+    if (imageUrls.length > 0) {
+      mergeImages(imageUrls, 5);
+    }
+  </script>
+  <div style="position: fixed; left: 1020px">
+    <table>
+      <tr>
+        <td>Anarchist</td> 
+        <td><input type="button" class="add" onclick="addIdeology('ana');"/></td>
+        <td><input type="button" class="remove" onclick="removeIdeology('ana');"/></td>
+      </tr>
+      <tr>
+        <td> Authoritarian</td> 
+        <td><input type="button" class="add" onclick="addIdeology('auth');"/></td>
+        <td><input type="button" class="remove" onclick="removeIdeology('auth');"/></td>
+      </tr>
+      <tr>
+        <td>Capitalism</td> 
+        <td><input type="button" class="add" onclick="addIdeology('cap');"/></td>
+        <td><input type="button" class="remove" onclick="removeIdeology('cap');"/></td>
+      </tr>
+      <tr>
+        <td>Communist</td> 
+        <td><input type="button" class="add" onclick="addIdeology('com');"/></td>
+        <td><input type="button" class="remove" onclick="removeIdeology('com');"/></td>
+      </tr>
+      <tr>
+        <td>Conservative</td> 
+        <td><input type="button" class="add" onclick="addIdeology('con');"/></td>
+        <td><input type="button" class="remove" onclick="removeIdeology('con');"/></td>
+      </tr>
+      <tr>
+        <td>Environmentalist</td> 
+        <td><input type="button" class="add" onclick="addIdeology('env');"/></td>
+        <td><input type="button" class="remove" onclick="removeIdeology('env');"/></td>
+      </tr>
+      <tr>
+        <td>Fascist</td> 
+        <td><input type="button" class="add" onclick="addIdeology('fas');"/></td>
+        <td><input type="button" class="remove" onclick="removeIdeology('fas');"/></td>
+      </tr>
+      <tr>
+        <td>Feminism</td> 
+        <td><input type="button" class="add" onclick="addIdeology('fem');"/></td>
+        <td><input type="button" class="remove" onclick="removeIdeology('fem');"/></td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>
